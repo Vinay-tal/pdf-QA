@@ -13,8 +13,28 @@ PINECONE_API_KEY = st.secrets["PINECONE_API_KEY"]
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # 🌐 Initialize Pinecone
-pinecone.init(api_key=PINECONE_API_KEY, environment="gcp-starter")
-index_name = "pdf-rag-openai"
+from pinecone import Pinecone, ServerlessSpec
+
+# Initialize Pinecone
+pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
+
+# Index name and region
+index_name = "pdf-rag"
+
+# Create the index if it doesn't exist
+if index_name not in pc.list_indexes().names():
+    pc.create_index(
+        name=index_name,
+        dimension=1536,
+        metric="cosine",
+        spec=ServerlessSpec(
+            cloud="aws",  # or "gcp"
+            region="us-east-1"  # replace with your actual region from Pinecone dashboard
+        )
+    )
+
+# Connect to the index
+index = pc.Index(index_name)
 
 # Set OpenAI API key
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
