@@ -3,83 +3,60 @@ import os
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 import pinecone
 
-# 🚨 Load API keys securely from Streamlit secrets
+# ✅ Load API keys from secrets
 PINECONE_API_KEY = st.secrets["PINECONE_API_KEY"]
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-
-# 🌐 Initialize Pinecone
-from langchain.vectorstores import Pinecone  # ✅ CORRECT, ServerlessSpec
-
-# Initialize Pinecone
-pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
-
-# Index name and region
-index_name = "pdf-rag"
-
-# Create the index if it doesn't exist
-if index_name not in pc.list_indexes().names():
-    pc.create_index(
-        name=index_name,
-        dimension=1536,
-        metric="cosine",
-        spec=ServerlessSpec(
-            cloud="aws",  # or "gcp"
-            region="us-east-1"  # replace with your actual region from Pinecone dashboard
-        )
-    )
-
-# Connect to the index
-index = pc.Index(index_name)
-
-# Set OpenAI API key
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
+# ✅ Initialize Pinecone
+pinecone.init(api_key=PINECONE_API_KEY, environment="gcp-starter")  # Use your Pinecone env
+index_name = "pdf-rag-openai"
+
 # 🎨 Streamlit UI
-st.set_page_config(page_title="PDF Q&A with OpenAI", layout="wide")
-st.title("📄 Ask Questions from Your PDF")
-st.markdown("Upload a PDF and ask any question — powered by OpenAI + Pinecone.")
+st.set_page_config(page_title="📄 PDF Q&A with OpenAI", layout="wide")
+st.title("📄 Ask Questions About Your PDF")
+st.markdown("Upload a PDF and ask any question. Powered entirely by OpenAI + Pinecone.")
 
 # 📄 Upload PDF
-uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
+uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
 
 if uploaded_file:
     with open("uploaded.pdf", "wb") as f:
         f.write(uploaded_file.read())
+    st.success("✅ PDF uploaded!")
 
-    st.success("✅ PDF uploaded successfully!")
-
-    # 📑 Load and split PDF
-    with st.spinner("Reading and splitting PDF..."):
+    # 📑 Load and split
+    with st.spinner("🔍 Reading and chunking PDF..."):
         loader = PyPDFLoader("uploaded.pdf")
         pages = loader.load()
         splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         docs = splitter.split_documents(pages)
 
-    # 🔍 Generate embeddings
-   from langchain.embeddings import OpenAIEmbeddings
-from langchain.embeddings import OpenAIEmbeddings
-        vectorstore = Pinecone.from_documents(docs, embedder, index_name=index_name)
+    # 🧠 OpenAI Embeddings
+    with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
+        embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+        vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name)
 
-    # 🔮 Load OpenAI LLM
+    # 🔮 OpenAI LLM
     llm = OpenAI(temperature=0.5, openai_api_key=OPENAI_API_KEY)
 
-    # 🧠 Build QA chain
+    # ⚙️ QA Chain
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         retriever=vectorstore.as_retriever()
     )
 
-    # ❓ Ask a question
-    st.subheader("Ask a question about the PDF:")
+    # ❓ Ask Question
+    st.subheader("Ask a question:")
     query = st.text_input("Type your question here...")
 
     if query:
-        with st.spinner("Generating answer..."):
-            result = qa_chain.run(query)
+        with st.spinner("🤖 Thinking..."):
+            answer = qa_chain.run(query)
             st.success("💡 Answer:")
-            st.write(result)
+            st.write(answer)
