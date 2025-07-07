@@ -2,7 +2,7 @@ streamlit
 langchain
 langchain-community
 openai
-pinecone-client
+pinecone
 sentence-transformers
 PyPDF2
 python-dotenv
