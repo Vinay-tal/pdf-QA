@@ -15,7 +15,6 @@ os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 # ✅ Initialize Pinecone
 from langchain.vectorstores import Pinecone  # ✅ CORRECT
-, ServerlessSpec
 
 # Initialize Pinecone
 pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
