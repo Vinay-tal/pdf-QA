@@ -67,25 +67,25 @@ vectorstore = LangchainPinecone.from_documents(
 
 
     # 🧠 OpenAI Embeddings
-    with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
+with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
         vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name)
 
     # 🔮 OpenAI LLM
-    llm = OpenAI(temperature=0.5, openai_api_key=OPENAI_API_KEY)
+llm = OpenAI(temperature=0.5, openai_api_key=OPENAI_API_KEY)
 
     # ⚙️ QA Chain
-    qa_chain = RetrievalQA.from_chain_type(
+qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         retriever=vectorstore.as_retriever()
     )
 
     # ❓ Ask Question
-    st.subheader("Ask a question:")
-    query = st.text_input("Type your question here...")
+st.subheader("Ask a question:")
+query = st.text_input("Type your question here...")
 
-    if query:
-        with st.spinner("🤖 Thinking..."):
-            answer = qa_chain.run(query)
-            st.success("💡 Answer:")
-            st.write(answer)
+if query:
+    with st.spinner("🤖 Thinking..."):
+        answer = qa_chain.run(query)
+        st.success("💡 Answer:")
+        st.write(answer)
