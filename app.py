@@ -53,12 +53,21 @@ if uploaded_file:
         f.write(uploaded_file.read())
     st.success("✅ PDF uploaded!")
 
-    # 📑 Load and split
-    with st.spinner("🔍 Reading and chunking PDF..."):
+    with st.spinner("📚 Reading and splitting PDF..."):
         loader = PyPDFLoader("uploaded.pdf")
         pages = loader.load()
         splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        docs = splitter.split_documents(pages)
+        docs = splitter.split_documents(pages)  # ✅ This is where docs is defined
+
+    # Then use docs here:
+    vectorstore = LangchainPinecone.from_documents(
+        docs,
+        embeddings,
+        index_name="pdf-rag-openai",
+        pinecone_api_key=PINECONE_API_KEY,
+        pinecone_environment="us-east-1"
+    )
+
 
     # 🧠 OpenAI Embeddings
     with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
