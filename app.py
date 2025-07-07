@@ -14,36 +14,32 @@ OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 # ✅ Initialize Pinecone
-import pinecone  # ✅ This is from the official pinecone-client package
-from langchain.vectorstores import Pinecone  # ✅ LangChain's wrapper
+from pinecone import Pinecone
 
-# Initialize the Pinecone client
-pinecone.init(api_key=PINECONE_API_KEY, environment="gcp-starter")
+# Create Pinecone client using new SDK
+pc = Pinecone(api_key=PINECONE_API_KEY)
 
-# Use LangChain's Pinecone class
-vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name)
-  # ✅ CORRECT
-
-# Initialize Pinecone
-pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
-
-# Index name and region
-index_name = "pdf-rag"
-
-# Create the index if it doesn't exist
-if index_name not in pc.list_indexes().names():
+# Only create index if not already created (optional)
+if "pdf-rag-openai" not in pc.list_indexes().names():
+    from pinecone import ServerlessSpec
     pc.create_index(
-        name=index_name,
+        name="pdf-rag-openai",
         dimension=1536,
         metric="cosine",
-        spec=ServerlessSpec(
-            cloud="aws",  # or "gcp"
-            region="us-east-1"  # replace with your actual region from Pinecone dashboard
-        )
+        spec=ServerlessSpec(cloud="aws", region="us-west-2")
     )
 
-# Connect to the index
-index = pc.Index(index_name)
+# Use LangChain wrapper (this part still uses old format)
+from langchain.vectorstores import Pinecone as LangchainPinecone
+
+vectorstore = LangchainPinecone.from_documents(
+    docs,
+    embeddings,
+    index_name="pdf-rag-openai",
+    pinecone_api_key=PINECONE_API_KEY,
+    pinecone_environment="us-west-2"
+)
+
 # 🎨 Streamlit UI
 st.set_page_config(page_title="📄 PDF Q&A with OpenAI", layout="wide")
 st.title("📄 Ask Questions About Your PDF")
