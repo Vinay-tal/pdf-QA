@@ -61,8 +61,8 @@ if uploaded_file:
         docs = splitter.split_documents(pages)
 
     # 🔍 Generate embeddings
-    with st.spinner("Generating embeddings and uploading to Pinecone..."):
-        embedder = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+   from langchain.embeddings import OpenAIEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
         vectorstore = Pinecone.from_documents(docs, embedder, index_name=index_name)
 
     # 🔮 Load OpenAI LLM
