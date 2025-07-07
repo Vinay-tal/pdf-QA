@@ -51,11 +51,8 @@ if uploaded_file:
         pages = loader.load()
         splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         docs = splitter.split_documents(pages)
-        
-        from langchain.embeddings.openai import OpenAIEmbeddings
-embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 # ✅ This is where docs is defined
-docs = splitter.split_documents(pages)
+
     # Then use docs here:
 vectorstore = LangchainPinecone.from_documents(
         docs,
@@ -65,7 +62,8 @@ vectorstore = LangchainPinecone.from_documents(
         pinecone_environment="us-east-1"
     )
 
-
+        from langchain.embeddings.openai import OpenAIEmbeddings
+embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
     # 🧠 OpenAI Embeddings
 with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
