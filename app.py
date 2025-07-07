@@ -55,7 +55,7 @@ if uploaded_file:
         from langchain.embeddings.openai import OpenAIEmbeddings
 embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 # ✅ This is where docs is defined
-
+docs = splitter.split_documents(pages)
     # Then use docs here:
 vectorstore = LangchainPinecone.from_documents(
         docs,
