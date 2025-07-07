@@ -50,7 +50,11 @@ if uploaded_file:
         loader = PyPDFLoader("uploaded.pdf")
         pages = loader.load()
         splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        docs = splitter.split_documents(pages)  # ✅ This is where docs is defined
+        docs = splitter.split_documents(pages)
+        
+        from langchain.embeddings.openai import OpenAIEmbeddings
+embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+# ✅ This is where docs is defined
 
     # Then use docs here:
     vectorstore = LangchainPinecone.from_documents(
