@@ -14,7 +14,15 @@ OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 # ✅ Initialize Pinecone
-from langchain.vectorstores import Pinecone  # ✅ CORRECT
+import pinecone  # ✅ This is from the official pinecone-client package
+from langchain.vectorstores import Pinecone  # ✅ LangChain's wrapper
+
+# Initialize the Pinecone client
+pinecone.init(api_key=PINECONE_API_KEY, environment="gcp-starter")
+
+# Use LangChain's Pinecone class
+vectorstore = Pinecone.from_documents(docs, embeddings, index_name=index_name)
+  # ✅ CORRECT
 
 # Initialize Pinecone
 pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
