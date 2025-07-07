@@ -32,13 +32,6 @@ if "pdf-rag-openai" not in pc.list_indexes().names():
 # Use LangChain wrapper (this part still uses old format)
 from langchain.vectorstores import Pinecone as LangchainPinecone
 
-vectorstore = LangchainPinecone.from_documents(
-    docs,
-    embeddings,
-    index_name="pdf-rag-openai",
-    pinecone_api_key=PINECONE_API_KEY,
-    pinecone_environment="us-west-2"
-)
 
 # 🎨 Streamlit UI
 st.set_page_config(page_title="📄 PDF Q&A with OpenAI", layout="wide")
