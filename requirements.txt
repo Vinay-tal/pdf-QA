@@ -1,6 +1,8 @@
 streamlit
 langchain
+openai
 pinecone-client
 sentence-transformers
 PyPDF2
-huggingface_hub
+python-dotenv
+
