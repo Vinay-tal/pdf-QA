@@ -62,7 +62,7 @@ vectorstore = LangchainPinecone.from_documents(
         pinecone_environment="us-east-1"
     )
 
-        from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
     # 🧠 OpenAI Embeddings
 with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
