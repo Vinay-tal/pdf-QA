@@ -26,7 +26,7 @@ if "pdf-rag-openai" not in pc.list_indexes().names():
         name="pdf-rag-openai",
         dimension=1536,
         metric="cosine",
-        spec=ServerlessSpec(cloud="aws", region="us-west-2")
+        spec=ServerlessSpec(cloud="aws", region="us-east-1")
     )
 
 # Use LangChain wrapper (this part still uses old format)
