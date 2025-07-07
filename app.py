@@ -57,7 +57,7 @@ embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 # ✅ This is where docs is defined
 
     # Then use docs here:
-    vectorstore = LangchainPinecone.from_documents(
+vectorstore = LangchainPinecone.from_documents(
         docs,
         embeddings,
         index_name="pdf-rag-openai",
