@@ -59,8 +59,6 @@ if uploaded_file:
     with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 
-        index = pc.Index(index_name)
-        
         vectorstore = LangchainPinecone.from_documents(
             docs,
             embedding=embeddings,
