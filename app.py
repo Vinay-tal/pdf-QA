@@ -16,9 +16,8 @@ os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 # ✅ Initialize Pinecone
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
-# ✅ Create index if not exists
 index_name = "pdf-rag-openai"
-# 📦 Pinecone index (new SDK)
+
 if index_name not in pc.list_indexes().names():
     pc.create_index(
         name=index_name,
@@ -26,6 +25,17 @@ if index_name not in pc.list_indexes().names():
         metric="cosine",
         spec=ServerlessSpec(cloud="aws", region="us-east-1")
     )
+
+    # Wait for index to be ready
+    import time
+    while True:
+        status = pc.describe_index(index_name).status['ready']
+        if status:
+            break
+        time.sleep(1)
+
+# Now safely access it
+index = pc.Index(index_name)
 
 # 🎨 Streamlit UI
 st.set_page_config(page_title="📄 PDF Q&A with OpenAI", layout="wide")
