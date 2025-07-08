@@ -16,26 +16,21 @@ os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 # ✅ Initialize Pinecone
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
-index_name = "pdf-rag-openai"
+# ✅ Index name and region
+index_name = "pdf-rag"
+pinecone_region = "us-east-1"
 
+# ✅ Create the index if it doesn't exist
 if index_name not in pc.list_indexes().names():
     pc.create_index(
         name=index_name,
         dimension=1536,
         metric="cosine",
-        spec=ServerlessSpec(cloud="aws", region="us-east-1")
+        spec=ServerlessSpec(
+            cloud="aws",
+            region=pinecone_region
+        )
     )
-
-    # Wait for index to be ready
-    import time
-    while True:
-        status = pc.describe_index(index_name).status['ready']
-        if status:
-            break
-        time.sleep(1)
-
-# Now safely access it
-index = pc.Index(index_name)
 
 # 🎨 Streamlit UI
 st.set_page_config(page_title="📄 PDF Q&A with OpenAI", layout="wide")
@@ -59,11 +54,13 @@ if uploaded_file:
     with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 
+        # ✅ Use index_name, api_key, env (not `index` object)
         vectorstore = LangchainPinecone.from_documents(
             docs,
             embedding=embeddings,
-            index=index,
-            text_key="text"
+            index_name=index_name,
+            pinecone_api_key=PINECONE_API_KEY,
+            pinecone_environment=pinecone_region
         )
 
         # 🔮 OpenAI LLM
