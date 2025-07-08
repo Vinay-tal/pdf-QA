@@ -18,6 +18,7 @@ pc = Pinecone(api_key=PINECONE_API_KEY)
 
 # ✅ Create index if not exists
 index_name = "pdf-rag-openai"
+# 📦 Pinecone index (new SDK)
 if index_name not in pc.list_indexes().names():
     pc.create_index(
         name=index_name,
@@ -47,12 +48,14 @@ if uploaded_file:
 
     with st.spinner("🔗 Creating vectorstore with OpenAI Embeddings..."):
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+
+        index = pc.Index(index_name)
+        
         vectorstore = LangchainPinecone.from_documents(
             docs,
-            embeddings,
-            index_name=index_name,
-            pinecone_api_key=PINECONE_API_KEY,
-            pinecone_environment="us-east-1"
+            embedding=embeddings,
+            index=index,
+            text_key="text"
         )
 
         # 🔮 OpenAI LLM
